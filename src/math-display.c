@@ -27,6 +27,8 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
+    GtkWidget *temp_view;
+	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
 
@@ -328,8 +330,17 @@ create_gui(MathDisplay *display)
 
     main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(display), main_box);
-
+	
     g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
+    
+    display->priv->temp_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(display->priv->temp_view),FALSE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->temp_view), GTK_WRAP_WORD);
+    gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(display->priv->temp_view), FALSE);
+    gtk_text_view_set_pixels_above_lines(GTK_TEXT_VIEW(display->priv->temp_view), 8);
+    gtk_text_view_set_pixels_below_lines(GTK_TEXT_VIEW(display->priv->temp_view), 2);
+    gtk_text_view_set_justification(GTK_TEXT_VIEW(display->priv->temp_view), GTK_JUSTIFY_RIGHT);
+    gtk_box_pack_start(GTK_BOX(main_box), display->priv->temp_view, TRUE, TRUE, 5);
 
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -373,6 +384,7 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
+    gtk_widget_show(display->priv->temp_view);
     gtk_widget_show(display->priv->text_view);
     gtk_widget_show(main_box);
 
