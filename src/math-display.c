@@ -27,7 +27,8 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
-    GtkWidget *temp_view;
+	/*History Panel*/
+    GtkWidget *history_view;
 	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
@@ -116,10 +117,11 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 
     state = event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK);
     c = gdk_keyval_to_unicode(event->keyval);
-
+	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
         math_equation_solve(display->priv->equation);
+		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,"test");
         return TRUE;
     }
 
@@ -331,10 +333,11 @@ create_gui(MathDisplay *display)
     main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(display), main_box);
 	
-    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
-    
-    display->priv->temp_view = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(main_box), display->priv->temp_view, TRUE, TRUE, 5);
+    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display)
+    	;
+	
+    display->priv->history_view = gtk_combo_box_text_new();
+    gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 5);
 
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -378,7 +381,7 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
-    gtk_widget_show(display->priv->temp_view);
+    gtk_widget_show(display->priv->history_view);
     gtk_widget_show(display->priv->text_view);
     gtk_widget_show(main_box);
 
