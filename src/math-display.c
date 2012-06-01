@@ -121,7 +121,7 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
         math_equation_solve(display->priv->equation);
-		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,"test");
+		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,math_equation_get_display(display->priv->equation));
         return TRUE;
     }
 
