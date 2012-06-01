@@ -29,6 +29,9 @@ struct MathDisplayPrivate
 
 	/*History Panel*/
     GtkWidget *history_view;
+
+	/*Keeps track of number of equations*/
+	gint counter;
 	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
@@ -120,8 +123,10 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-        math_equation_solve(display->priv->equation);
+		display->priv->counter=display->priv->counter + 1;
 		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,math_equation_get_display(display->priv->equation));
+		gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
+		math_equation_solve(display->priv->equation);
         return TRUE;
     }
 
@@ -339,6 +344,10 @@ create_gui(MathDisplay *display)
     display->priv->history_view = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 5);
 
+	//initialize the counter
+	//set to -1 so no if statement is required to check if its the first calculation or not
+	display->priv->counter=-1;
+	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
     gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(display->priv->text_view), FALSE);
