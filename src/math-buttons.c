@@ -11,7 +11,6 @@
 #include <glib/gi18n.h>
 
 #include "math-buttons.h"
-#include "math-display.h"
 #include "math-converter.h"
 #include "math-variable-popup.h"
 #include "financial.h"
@@ -792,13 +791,6 @@ G_MODULE_EXPORT
 void
 solve_cb(GtkWidget *widget, MathButtons *buttons)
 {
-	/*
-	MathDisplay *history;
-	//get the display using an accessor and assign to history
-	history->priv->counter=history->priv->counter + 1;
-	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(history->priv->history_view),0,math_equation_get_equation(history->priv->equation));
-	//gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
-	*/
     math_equation_solve(buttons->priv->equation);
 }
 
