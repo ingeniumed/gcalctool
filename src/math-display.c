@@ -8,11 +8,18 @@
  * license.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <time.h>
+#include <locale.h>
 #include <glib/gi18n.h>
 #include <gdk/gdkkeysyms.h>
 
 #include "math-display.h"
+#include "mp-serializer.h"
+#include "mp-equation.h"
 
 enum {
     PROP_0,
@@ -27,6 +34,12 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
+	/*History Panel*/
+    GtkWidget *history_view;
+
+	/*Keeps track of number of equations*/
+	gint counter;
+	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
 
@@ -62,6 +75,10 @@ math_display_get_equation(MathDisplay *display)
 static gboolean
 display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display)
 {
+	MpSerializer *result_serializer;
+	int ret;
+	char *equation;
+	MPEquationOptions options;
     int state;
     guint32 c;
     guint new_keyval = 0;
@@ -114,10 +131,36 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 
     state = event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK);
     c = gdk_keyval_to_unicode(event->keyval);
-
+	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-        math_equation_solve(display->priv->equation);
+		result_serializer = mp_serializer_new(MP_DISPLAY_FORMAT_AUTOMATIC, 10, 9);
+		equation = math_equation_get_equation(display->priv->equation);
+		MPNumber z;
+		gchar *result_str = NULL;
+		memset(&options, 0, sizeof(options));
+		options.base = 10;
+		options.wordlen = 32;
+		options.angle_units = MP_DEGREES;
+		ret = mp_equation_parse(equation, &options, &z, NULL);
+		if (ret == PARSER_ERR_MP)
+		{
+		    //nothing
+		}
+		else if (ret)        
+		{
+			//nothing
+		}
+		else 
+		{
+		    result_str = mp_serializer_to_string(result_serializer, &z);
+			display->priv->counter=display->priv->counter + 1;
+			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,math_equation_get_equation(display->priv->equation));
+			//gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
+			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,result_str);
+			g_free(result_str);
+		}
+		math_equation_solve(display->priv->equation);
         return TRUE;
     }
 
@@ -328,9 +371,17 @@ create_gui(MathDisplay *display)
 
     main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(display), main_box);
+	
+    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display)
+    	;
+	
+    display->priv->history_view = gtk_combo_box_text_new();
+    gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 5);
 
-    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
-
+	//initialize the counter
+	//set to -1 so no if statement is required to check if its the first calculation or not
+	display->priv->counter=-1;
+	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
     gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(display->priv->text_view), FALSE);
@@ -373,6 +424,7 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
+    gtk_widget_show(display->priv->history_view);
     gtk_widget_show(display->priv->text_view);
     gtk_widget_show(main_box);
 
