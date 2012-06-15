@@ -388,7 +388,7 @@ create_menu(MathWindow *window)
 
 static void
 create_gui(MathWindow *window)
-{
+{	
     GtkWidget *main_vbox, *vbox;
     GtkWidget *scrolled_window;
   

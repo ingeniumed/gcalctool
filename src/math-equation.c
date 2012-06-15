@@ -25,6 +25,7 @@
 #include "mp-serializer.h"
 #include "mp-enums.h"
 #include "unit-manager.h"
+#include "math-display.h"
 
 
 enum {
@@ -66,7 +67,6 @@ typedef struct {
 struct MathEquationPrivate
 {
     GtkTextTag *ans_tag;
-
     gint word_size;           /* Word size in bits */
     MPAngleUnit angle_units;  /* Units for trigonometric functions */
     char *source_currency;
@@ -808,7 +808,6 @@ math_equation_get_display(MathEquation *equation)
     return gtk_text_buffer_get_text(GTK_TEXT_BUFFER(equation), &start, &end, FALSE);
 }
 
-
 gchar *
 math_equation_get_equation(MathEquation *equation)
 {
@@ -1180,7 +1179,6 @@ parse(MathEquation *equation, const char *text, MPNumber *z, char **error_token)
     return mp_equation_parse(text, &options, z, error_token);
 }
 
-
 /*
  * Executed in separate thread. It is thus not a good idea to write to anything
  * in MathEquation but the async queue from here.
@@ -1251,7 +1249,6 @@ math_equation_solve_real(gpointer data)
             break;
     }
     g_async_queue_push(equation->priv->queue, solvedata);
-
     return NULL;
 }
 
@@ -1300,7 +1297,7 @@ math_equation_look_for_answer(gpointer data)
 
 void
 math_equation_solve(MathEquation *equation)
-{
+{	
     g_return_if_fail(equation != NULL);
 
     // FIXME: should replace calculation or give error message

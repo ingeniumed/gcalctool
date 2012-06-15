@@ -70,8 +70,7 @@ math_display_get_equation(MathDisplay *display)
 {
     return display->priv->equation;
 }
-
-
+                                           
 static gboolean
 display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display)
 {
@@ -134,6 +133,7 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
+		/*Using the solve method in command line gcalctool to get the answer*/
 		result_serializer = mp_serializer_new(MP_DISPLAY_FORMAT_AUTOMATIC, 10, 9);
 		equation = math_equation_get_equation(display->priv->equation);
 		MPNumber z;
@@ -153,10 +153,14 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 		}
 		else 
 		{
-		    result_str = mp_serializer_to_string(result_serializer, &z);
-			display->priv->counter=display->priv->counter + 1;
+		    result_str = mp_serializer_to_string(result_serializer, &z);//get the answer
+			display->priv->counter=display->priv->counter + 1;//increment index of combo box entry for equation
+			//add the equation to the combo box
 			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,math_equation_get_equation(display->priv->equation));
-			//gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
+			//Make the current equation as the text on the combo box seen by the user 
+			gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
+display->priv->counter=display->priv->counter + 1;//increment index of combo box entry for answer
+			//now add the answer to the combo box
 			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,result_str);
 			g_free(result_str);
 		}
@@ -372,8 +376,7 @@ create_gui(MathDisplay *display)
     main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(display), main_box);
 	
-    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display)
-    	;
+    g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
 	
     display->priv->history_view = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 5);
