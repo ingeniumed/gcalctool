@@ -49,6 +49,8 @@ typedef struct
 
 GType math_history_get_type (void);
 
+MathHistory *math_history_new(MathEquation *equation);
+
 G_END_DECLS
 
 #endif /* _MATH_HISTORY_H_ */

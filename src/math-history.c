@@ -22,11 +22,17 @@ history-panel-prototype is free software: you can redistribute it and/or modify 
 #include <glib/gi18n.h>
 
 #include "math-history.h"
+#include "math-buttons.h"
 
 struct MathHistoryPrivate
-{
-	/*History
-	 Panel*/
+{   
+	/*the equation being displayed*/
+	MathEquation *equation;
+
+	/*the equals button pressed instead of enter key for solving*/
+	MathButtons *equals_key;
+	
+	/*History Panel*/
     GtkWidget *history_panel;
 
 	/*Keeps track of number of equations and answers added so far*/
@@ -35,7 +41,14 @@ struct MathHistoryPrivate
 
 G_DEFINE_TYPE (MathHistory, math_history, GTK_TYPE_WIDGET);
 
+MathHistory *
+math_history_new(MathEquation *equation)
+{
+	MathHistory *history = g_object_new(math_history_get_type(), NULL);
 
+}
+	
+                 
 static void
 math_history_class_init (MathHistoryClass *klass)
 {
