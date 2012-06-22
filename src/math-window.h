@@ -16,6 +16,7 @@
 #include "math-equation.h"
 #include "math-display.h"
 #include "math-buttons.h"
+#include "math-history.h"
 
 G_BEGIN_DECLS
 
@@ -41,6 +42,8 @@ GType math_window_get_type(void);
 MathWindow *math_window_new(GtkApplication *app, MathEquation *equation);
 
 MathEquation *math_window_get_equation(MathWindow *window);
+
+//MathHistory *math_window_get_history(MathWindow *window);
 
 MathDisplay *math_window_get_display(MathWindow *window);
 

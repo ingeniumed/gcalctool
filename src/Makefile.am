@@ -25,6 +25,8 @@ gcalctool_SOURCES = \
 	math-display.h \
 	math-equation.c \
 	math-equation.h \
+        math-history.c \
+	math-history.h \ 
 	math-preferences.c \
 	math-preferences.h \
 	math-variables.c \

@@ -20,6 +20,7 @@
 #include "math-display.h"
 #include "mp-serializer.h"
 #include "mp-equation.h"
+#include "math-history.h"
 
 enum {
     PROP_0,
@@ -74,10 +75,7 @@ math_display_get_equation(MathDisplay *display)
 static gboolean
 display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display)
 {
-	MpSerializer *result_serializer;
-	int ret;
-	char *equation;
-	MPEquationOptions options;
+	bool flag;
     int state;
     guint32 c;
     guint new_keyval = 0;
@@ -133,37 +131,7 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-		/*Using the solve method in command line gcalctool to get the answer*/
-		result_serializer = mp_serializer_new(MP_DISPLAY_FORMAT_AUTOMATIC, 10, 9);
-		equation = math_equation_get_equation(display->priv->equation);
-		MPNumber z;
-		gchar *result_str = NULL;
-		memset(&options, 0, sizeof(options));
-		options.base = 10;
-		options.wordlen = 32;
-		options.angle_units = MP_DEGREES;
-		ret = mp_equation_parse(equation, &options, &z, NULL);
-		if (ret == PARSER_ERR_MP)
-		{
-		    //nothing
-		}
-		else if (ret)        
-		{
-			//nothing
-		}
-		else 
-		{
-		    result_str = mp_serializer_to_string(result_serializer, &z);//get the answer
-			display->priv->counter=display->priv->counter + 1;//increment index of combo box entry for equation
-			//add the equation to the combo box
-			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,math_equation_get_equation(display->priv->equation));
-			//Make the current equation as the text on the combo box seen by the user 
-			gtk_combo_box_set_active(GTK_COMBO_BOX_TEXT(display->priv->history_view),display->priv->counter);
-display->priv->counter=display->priv->counter + 1;//increment index of combo box entry for answer
-			//now add the answer to the combo box
-			gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(display->priv->history_view),0,result_str);
-			g_free(result_str);
-		}
+		flag = math_history_update(display->priv->history_view,display->priv->equation);
 		math_equation_solve(display->priv->equation);
         return TRUE;
     }

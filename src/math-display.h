@@ -15,6 +15,7 @@
 #include <gtk/gtk.h>
 
 #include "math-equation.h"
+#include "math-history.h"
 
 G_BEGIN_DECLS
 

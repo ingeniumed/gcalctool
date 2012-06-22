@@ -24,6 +24,7 @@ enum {
 struct MathWindowPrivate
 {
     MathEquation *equation;
+	//MathHistory *history;
     MathDisplay *display;
     MathButtons *buttons;
     MathPreferencesDialog *preferences_dialog;
@@ -65,6 +66,12 @@ math_window_get_buttons(MathWindow *window)
     return window->priv->buttons;
 }
 
+/*MathHistory *
+math_window_get_history(MathWindow *window)
+{
+	g_return_val_if_fail(window!=NULL,NULL);
+	return window->priv->history;
+}*/
 
 void
 math_window_critical_error(MathWindow *window, const gchar *title, const gchar *contents)
@@ -251,7 +258,7 @@ key_press_cb(MathWindow *window, GdkEventKey *event)
 {
     gboolean result;
     g_signal_emit_by_name(window->priv->display, "key-press-event", event, &result);
-
+	//g_signal_emit_by_name(window->priv->history,"key-press-event",event,&result);
     if (math_buttons_get_mode (window->priv->buttons) == PROGRAMMING && (event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) {
         switch(event->keyval)
         {
@@ -409,6 +416,10 @@ create_gui(MathWindow *window)
     window->priv->right_aligned = TRUE;
     gtk_widget_show(scrolled_window);
 
+	/*window->priv->history = math_history_new(window->priv->equation);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(window->priv->history));
+    gtk_widget_show(GTK_WIDGET(window->priv->history));*/
+	
     window->priv->display = math_display_new_with_equation(window->priv->equation);
     gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(window->priv->display));
     gtk_widget_show(GTK_WIDGET(window->priv->display));
@@ -416,7 +427,7 @@ create_gui(MathWindow *window)
     window->priv->buttons = math_buttons_new(window->priv->equation);
     g_signal_connect(window->priv->buttons, "notify::mode", G_CALLBACK(button_mode_changed_cb), window);
     button_mode_changed_cb(window->priv->buttons, NULL, window);
-    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(window->priv->buttons), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(window->priv->buttons), TRUE, TRUE, 0);
     gtk_widget_show(GTK_WIDGET(window->priv->buttons));
 }
 

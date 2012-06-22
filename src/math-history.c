@@ -1,68 +1,57 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * history-panel-prototype
- * Copyright (C) Gopal Krishnan 2012 <>
- * 
-history-panel-prototype is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * history-panel-prototype is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 1987-2008 Sun Microsystems, Inc. All Rights Reserved.
+ * Copyright (C) 2008-2011 Robert Ancell
+ * Copyright (C) 2012      Gopal Krishnan
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 2 of the License, or (at your option) any later
+ * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
+ * license.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <glib/gi18n.h>
+#include <gtk/gtk.h>
 
 #include "math-history.h"
-#include "math-buttons.h"
+#include "mp-serializer.h"
+#include "mp-equation.h"
 
-struct MathHistoryPrivate
-{   
-	/*the equation being displayed*/
-	MathEquation *equation;
-
-	/*the equals button pressed instead of enter key for solving*/
-	MathButtons *equals_key;
-	
-	/*History Panel*/
-    GtkWidget *history_panel;
-
-	/*Keeps track of number of equations and answers added so far*/
-	gint index_tracker;
-};
-
-G_DEFINE_TYPE (MathHistory, math_history, GTK_TYPE_WIDGET);
-
-MathHistory *
-math_history_new(MathEquation *equation)
+const bool math_history_update (GtkWidget *history_panel, MathEquation *equation)
 {
-	MathHistory *history = g_object_new(math_history_get_type(), NULL);
-
+	MpSerializer *result_serializer;
+	int ret;
+	char *equation_text;
+	MPEquationOptions options;
+	/*Using the solve method in command line gcalctool to get the answer*/
+	result_serializer = mp_serializer_new(MP_DISPLAY_FORMAT_AUTOMATIC, 10, 9);
+	equation_text = math_equation_get_equation(equation);
+	MPNumber z;
+	gchar *result_str = NULL;
+	memset(&options, 0, sizeof(options));
+	options.base = 10;
+	options.wordlen = 32;
+	options.angle_units = MP_DEGREES;
+	ret = mp_equation_parse(equation_text, &options, &z, NULL);
+	if (ret == PARSER_ERR_MP)
+	{
+		return false;
+	}
+	else if (ret)        
+	{
+		return false;
+	}
+	else 
+	{
+		result_str = mp_serializer_to_string(result_serializer, &z);//get the answer
+		//add the equation to the combo box
+		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(history_panel),0,math_equation_get_equation(equation));
+		//now add the answer to the combo box
+		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(history_panel),0,result_str);
+		g_free(result_str);
+		return true;
+	}
 }
-	
-                 
-static void
-math_history_class_init (MathHistoryClass *klass)
-{
-	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-	g_type_class_add_private(klass, sizeof(MathHistoryPrivate));
-	//something else to add here
-	//object_class->finalize = math_history_finalize;
-}
-
-static void
-math_history_init (MathHistory *history)
-{
-history->priv = G_TYPE_INSTANCE_GET_PRIVATE(history, math_history_get_type(), MathHistoryPrivate);
-//initialize the gui here along with the interactions when the combo box is changed 
-}
-
-
