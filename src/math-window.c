@@ -14,6 +14,7 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "math-window.h"
+#include "math-history.h"
 #include "math-preferences.h"
 
 enum {
@@ -24,7 +25,6 @@ enum {
 struct MathWindowPrivate
 {
     MathEquation *equation;
-	//MathHistory *history;
     MathDisplay *display;
     MathButtons *buttons;
     MathPreferencesDialog *preferences_dialog;
@@ -416,12 +416,8 @@ create_gui(MathWindow *window)
     window->priv->right_aligned = TRUE;
     gtk_widget_show(scrolled_window);
 
-	/*window->priv->history = math_history_new(window->priv->equation);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(window->priv->history));
-    gtk_widget_show(GTK_WIDGET(window->priv->history));*/
-	
     window->priv->display = math_display_new_with_equation(window->priv->equation);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(window->priv->display));
+	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(window->priv->display));
     gtk_widget_show(GTK_WIDGET(window->priv->display));
 
     window->priv->buttons = math_buttons_new(window->priv->equation);

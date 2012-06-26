@@ -18,6 +18,8 @@
 
 #include "math-equation.h"
 
-const bool math_history_update (GtkWidget *history_panel, MathEquation *equation);
+const bool math_history_update (GtkWidget *history_panel,MathEquation *equation);
+
+G_END_DECLS
 
 #endif /* _MATH_HISTORY_H_ */

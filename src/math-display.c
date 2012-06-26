@@ -71,11 +71,17 @@ math_display_get_equation(MathDisplay *display)
 {
     return display->priv->equation;
 }
-                                           
+
+static void
+combo_box_selection (GtkWidget *widget, MathDisplay *display)
+{
+	gchar *new_equation_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
+	math_equation_set(display->priv->equation,new_equation_text);
+}
+
 static gboolean
 display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display)
 {
-	bool flag;
     int state;
     guint32 c;
     guint new_keyval = 0;
@@ -131,8 +137,9 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-		flag = math_history_update(display->priv->history_view,display->priv->equation);
-		math_equation_solve(display->priv->equation);
+		bool flag;
+		flag = math_history_update(display->priv->history_view, display->priv->equation); 
+	    math_equation_solve(display->priv->equation);
         return TRUE;
     }
 
@@ -347,11 +354,8 @@ create_gui(MathDisplay *display)
     g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
 	
     display->priv->history_view = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 5);
-
-	//initialize the counter
-	//set to -1 so no if statement is required to check if its the first calculation or not
-	display->priv->counter=-1;
+	g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
+	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);
 	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -395,8 +399,8 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
-    gtk_widget_show(display->priv->history_view);
     gtk_widget_show(display->priv->text_view);
+	gtk_widget_show(display->priv->history_view);
     gtk_widget_show(main_box);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
