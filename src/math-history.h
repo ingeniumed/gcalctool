@@ -18,7 +18,10 @@
 
 #include "math-equation.h"
 
-const bool math_history_update (GtkWidget *history_panel,MathEquation *equation);
+G_BEGIN_DECLS
+
+const bool math_history_update_enter_key (GtkWidget *history_panel, MathEquation *equation);
+void add_to_list(GtkWidget *list, MathEquation *equation);
 
 G_END_DECLS
 

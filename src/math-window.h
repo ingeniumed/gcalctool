@@ -16,7 +16,6 @@
 #include "math-equation.h"
 #include "math-display.h"
 #include "math-buttons.h"
-#include "math-history.h"
 
 G_BEGIN_DECLS
 

@@ -20,7 +20,13 @@
 #include "mp-serializer.h"
 #include "mp-equation.h"
 
-const bool math_history_update (GtkWidget *history_panel,MathEquation *equation)
+enum
+{
+  LIST_ITEM = 0,
+  N_COLUMNS
+};
+
+const bool math_history_update_enter_key (GtkWidget *history_panel, MathEquation *equation)
 {
     MpSerializer *result_serializer;
     int ret;
@@ -54,5 +60,45 @@ const bool math_history_update (GtkWidget *history_panel,MathEquation *equation)
         gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(history_panel),0,result_str);
         g_free(result_str);
         return true;
+    }
+}
+
+void
+add_to_list(GtkWidget *list, MathEquation *equation)
+{
+  	MpSerializer *result_serializer;
+    int ret;
+    char *equation_text;
+	GtkListStore *store;
+  	GtkTreeIter iter;
+    MPEquationOptions options;
+    /* Using the solve method in command line gcalctool to get the answer */ 
+    result_serializer = mp_serializer_new(MP_DISPLAY_FORMAT_AUTOMATIC, 10, 9);
+    equation_text = math_equation_get_equation(equation);
+    MPNumber z;
+    gchar *result_str = NULL;
+    memset(&options, 0, sizeof(options));
+    options.base = 10;
+    options.wordlen = 32;
+    options.angle_units = MP_DEGREES;
+    ret = mp_equation_parse(equation_text, &options, &z, NULL);
+    if (ret == PARSER_ERR_MP)
+    {
+        //nothing
+    }
+    else if (ret)        
+    {
+       //nothing
+    }
+    else 
+    {	
+        /* get the answer */ 
+        result_str = mp_serializer_to_string(result_serializer, &z);
+  		store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
+  		gtk_list_store_append(store, &iter);
+  		gtk_list_store_set(store, &iter, LIST_ITEM, math_equation_get_equation(equation), -1);
+		gtk_list_store_append(store, &iter);
+		gtk_list_store_set(store, &iter, LIST_ITEM, result_str, -1);
+        g_free(result_str);
     }
 }

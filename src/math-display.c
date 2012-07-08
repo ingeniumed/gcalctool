@@ -24,7 +24,9 @@
 
 enum {
     PROP_0,
-    PROP_EQUATION
+    PROP_EQUATION,
+  	LIST_ITEM = 0,
+  	N_COLUMNS
 };
 
 struct MathDisplayPrivate
@@ -35,11 +37,13 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
-	/*History Panel*/
-    GtkWidget *history_view;
+	GtkWidget *list;
+	
+	/*History Panel
+    GtkWidget *history_view;*/
 
-	/*Keeps track of number of equations*/
-	gint counter;
+	/*Keeps track of number of equations
+	gint counter;*/
 	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
@@ -72,11 +76,46 @@ math_display_get_equation(MathDisplay *display)
     return display->priv->equation;
 }
 
-static void
+/*static void
 combo_box_selection (GtkWidget *widget, MathDisplay *display)
 {
 	gchar *new_equation_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
 	math_equation_set(display->priv->equation,new_equation_text);
+}*/
+
+static void
+init_list(GtkWidget *list)
+{
+
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+  GtkListStore *store;
+
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("List Items",
+          renderer, "text", LIST_ITEM, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
+
+  store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
+
+  gtk_tree_view_set_model(GTK_TREE_VIEW(list), 
+      GTK_TREE_MODEL(store));
+
+  g_object_unref(store);
+}
+
+static void  on_changed(GtkWidget *widget, MathDisplay *display) 
+{
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  gchar *equation_text;
+
+  if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter)) 
+	{
+		gtk_tree_model_get(model, &iter, LIST_ITEM, &equation_text,  -1);
+		math_equation_set(display->priv->equation,equation_text);
+		g_free(equation_text);
+	}
 }
 
 static gboolean
@@ -137,8 +176,10 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-		bool flag;
-		flag = math_history_update(display->priv->history_view, display->priv->equation); 
+		//bool flag;
+		//flag = math_history_update_enter_key(display->priv->history_view,display->priv->equation);
+		add_to_list(display->priv->list,display->priv->equation);
+		gtk_tree_view_columns_autosize (GTK_TREE_VIEW(display->priv->list));
 	    math_equation_solve(display->priv->equation);
         return TRUE;
     }
@@ -344,6 +385,7 @@ static void
 create_gui(MathDisplay *display)
 {
     GtkWidget *info_view, *info_box, *main_box;
+	GtkTreeSelection *selection;
     PangoFontDescription *font_desc;
     int i;
     GtkStyle *style;
@@ -353,9 +395,9 @@ create_gui(MathDisplay *display)
 	
     g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
 	
-    display->priv->history_view = gtk_combo_box_text_new();
-	g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
-	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);
+	/*display->priv->history_view = gtk_combo_box_text_new();
+	//g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
+	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);*/
 	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -376,6 +418,13 @@ create_gui(MathDisplay *display)
     g_signal_connect(display->priv->text_view, "key-press-event", G_CALLBACK(display_key_press_cb), display);
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->text_view, TRUE, TRUE, 0);
 
+	display->priv->list = gtk_tree_view_new();
+  	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list ));
+	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
+	gtk_box_pack_start(GTK_BOX(main_box), display->priv->list , TRUE, TRUE, 5);
+
+	init_list(display->priv->list);
     info_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_start(GTK_BOX(main_box), info_box, FALSE, TRUE, 0);
 
@@ -399,8 +448,9 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
+	gtk_widget_show(display->priv->list);
     gtk_widget_show(display->priv->text_view);
-	gtk_widget_show(display->priv->history_view);
+	//gtk_widget_show(display->priv->history_view);
     gtk_widget_show(main_box);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
