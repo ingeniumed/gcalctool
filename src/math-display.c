@@ -448,10 +448,10 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
-	gtk_widget_show(display->priv->list);
     gtk_widget_show(display->priv->text_view);
+	gtk_widget_show(display->priv->list);
 	//gtk_widget_show(display->priv->history_view);
-    gtk_widget_show(main_box);
+    gtk_widget_show(main_bccdox);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
     status_changed_cb(display->priv->equation, NULL, display);
