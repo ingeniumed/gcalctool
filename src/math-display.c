@@ -398,7 +398,14 @@ create_gui(MathDisplay *display)
 	/*display->priv->history_view = gtk_combo_box_text_new();
 	//g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
 	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);*/
-	
+
+	display->priv->list = gtk_tree_view_new();
+  	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list ));
+	init_list(display->priv->list);
+	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
+	gtk_box_pack_start(GTK_BOX(main_box), display->priv->list , TRUE, TRUE, 5);
+
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
     gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(display->priv->text_view), FALSE);
@@ -418,13 +425,6 @@ create_gui(MathDisplay *display)
     g_signal_connect(display->priv->text_view, "key-press-event", G_CALLBACK(display_key_press_cb), display);
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->text_view, TRUE, TRUE, 0);
 
-	display->priv->list = gtk_tree_view_new();
-  	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list ));
-	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
-	gtk_box_pack_start(GTK_BOX(main_box), display->priv->list , TRUE, TRUE, 5);
-
-	init_list(display->priv->list);
     info_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_start(GTK_BOX(main_box), info_box, FALSE, TRUE, 0);
 
@@ -448,10 +448,10 @@ create_gui(MathDisplay *display)
 
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
-    gtk_widget_show(display->priv->text_view);
 	gtk_widget_show(display->priv->list);
+    gtk_widget_show(display->priv->text_view);
 	//gtk_widget_show(display->priv->history_view);
-    gtk_widget_show(main_bccdox);
+    gtk_widget_show(main_box);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
     status_changed_cb(display->priv->equation, NULL, display);
