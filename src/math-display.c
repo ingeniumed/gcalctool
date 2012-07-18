@@ -86,20 +86,18 @@ combo_box_selection (GtkWidget *widget, MathDisplay *display)
 static void
 init_list(GtkWidget *list)
 {
-
+  GtkTreeIter iter;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
   GtkListStore *store;
 
   renderer = gtk_cell_renderer_text_new();
-  column = gtk_tree_view_column_new_with_attributes("List Items",
-          renderer, "text", LIST_ITEM, NULL);
+  column = gtk_tree_view_column_new_with_attributes("List Items", renderer, "text", LIST_ITEM, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
 
   store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
 
-  gtk_tree_view_set_model(GTK_TREE_VIEW(list), 
-      GTK_TREE_MODEL(store));
+  gtk_tree_view_set_model(GTK_TREE_VIEW(list), GTK_TREE_MODEL(store));
 
   g_object_unref(store);
 }
@@ -384,7 +382,7 @@ status_changed_cb(MathEquation *equation, GParamSpec *spec, MathDisplay *display
 static void
 create_gui(MathDisplay *display)
 {
-    GtkWidget *info_view, *info_box, *main_box;
+    GtkWidget *info_view, *info_box, *main_box, *scrolled_window;
 	GtkTreeSelection *selection;
     PangoFontDescription *font_desc;
     int i;
@@ -399,12 +397,16 @@ create_gui(MathDisplay *display)
 	//g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
 	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);*/
 
+	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(scrolled_window), FALSE, TRUE, 0);
+	
 	display->priv->list = gtk_tree_view_new();
   	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list ));
-	init_list(display->priv->list);
 	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
-	gtk_box_pack_start(GTK_BOX(main_box), display->priv->list , TRUE, TRUE, 5);
+	init_list(display->priv->list);
+	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(display->priv->list));
 
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -446,9 +448,10 @@ create_gui(MathDisplay *display)
         gtk_widget_modify_bg(GTK_WIDGET(display), i, &style->base[i]);
     }
 
+	gtk_widget_show(scrolled_window);
+	gtk_widget_show(display->priv->list);
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
-	gtk_widget_show(display->priv->list);
     gtk_widget_show(display->priv->text_view);
 	//gtk_widget_show(display->priv->history_view);
     gtk_widget_show(main_box);
