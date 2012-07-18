@@ -37,13 +37,8 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
+	/*History Panel*/
 	GtkWidget *list;
-	
-	/*History Panel
-    GtkWidget *history_view;*/
-
-	/*Keeps track of number of equations
-	gint counter;*/
 	
     /* Buffer that shows errors etc */
     GtkTextBuffer *info_buffer;
@@ -76,17 +71,9 @@ math_display_get_equation(MathDisplay *display)
     return display->priv->equation;
 }
 
-/*static void
-combo_box_selection (GtkWidget *widget, MathDisplay *display)
-{
-	gchar *new_equation_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
-	math_equation_set(display->priv->equation,new_equation_text);
-}*/
-
 static void
 init_list(GtkWidget *list)
 {
-  GtkTreeIter iter;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
   GtkListStore *store;
@@ -392,14 +379,10 @@ create_gui(MathDisplay *display)
     gtk_container_add(GTK_CONTAINER(display), main_box);
 	
     g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
-	
-	/*display->priv->history_view = gtk_combo_box_text_new();
-	//g_signal_connect(display->priv->history_view, "changed", G_CALLBACK(combo_box_selection), display);
-	gtk_box_pack_start(GTK_BOX(main_box), display->priv->history_view, TRUE, TRUE, 0);*/
 
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(scrolled_window), FALSE, TRUE, 0);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);	
+    gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(scrolled_window), FALSE, FALSE, 0);
 	
 	display->priv->list = gtk_tree_view_new();
   	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
@@ -453,7 +436,6 @@ create_gui(MathDisplay *display)
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
     gtk_widget_show(display->priv->text_view);
-	//gtk_widget_show(display->priv->history_view);
     gtk_widget_show(main_box);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
