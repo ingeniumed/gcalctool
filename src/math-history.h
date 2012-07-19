@@ -20,7 +20,7 @@
 
 G_BEGIN_DECLS
 
-void add_to_list(GtkWidget *list, MathEquation *equation);
+void add_to_list(GtkWidget *list, MathEquation *equation, gboolean append_flag);
 
 G_END_DECLS
 
