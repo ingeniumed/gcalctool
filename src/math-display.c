@@ -161,8 +161,6 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-		//bool flag;
-		//flag = math_history_update_enter_key(display->priv->history_view,display->priv->equation);
 		add_to_list(display->priv->list,display->priv->equation);
 		gtk_tree_view_columns_autosize (GTK_TREE_VIEW(display->priv->list));
 	    math_equation_solve(display->priv->equation);
@@ -391,6 +389,9 @@ create_gui(MathDisplay *display)
 	init_list(display->priv->list);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(display->priv->list));
 
+	/* Sets the size of the scrolled window to two rows to show an equation and an answer */
+	gtk_widget_set_size_request (scrolled_window, -1, 50);
+	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
     gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(display->priv->text_view), FALSE);
@@ -439,7 +440,7 @@ create_gui(MathDisplay *display)
     gtk_widget_show(main_box);
 
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
-    status_changed_cb(display->priv->equation, NULL, display);
+	status_changed_cb(display->priv->equation, NULL, display);
 }
 
 
