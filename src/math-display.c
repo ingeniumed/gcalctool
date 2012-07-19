@@ -420,6 +420,7 @@ create_gui(MathDisplay *display)
   //FIXME:<property name="AtkObject::accessible-description" translatable="yes" comments="Accessible description for the area in which results are displayed">Result Region</property>
     g_signal_connect(display->priv->text_view, "key-press-event", G_CALLBACK(display_key_press_cb), display);
 	gtk_text_view_place_cursor_onscreen(GTK_TEXT_VIEW(display->priv->text_view));
+	gtk_widget_set_can_focus (GTK_WIDGET(display->priv->text_view), TRUE);
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->text_view, TRUE, TRUE, 0);
 
     info_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
@@ -450,6 +451,8 @@ create_gui(MathDisplay *display)
     gtk_widget_show(display->priv->text_view);
     gtk_widget_show(main_box);
 
+	gtk_widget_grab_focus (GTK_WIDGET(display->priv->text_view));
+	
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
 	status_changed_cb(display->priv->equation, NULL, display);
 }
