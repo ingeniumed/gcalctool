@@ -161,8 +161,6 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
 	
     /* Solve on enter */
     if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
-		add_to_list(display->priv->list,display->priv->equation);
-		gtk_tree_view_columns_autosize (GTK_TREE_VIEW(display->priv->list));
 	    math_equation_solve(display->priv->equation);
         return TRUE;
     }
@@ -363,11 +361,22 @@ status_changed_cb(MathEquation *equation, GParamSpec *spec, MathDisplay *display
     }
 }
 
+/* Checks if the enter key or the equals key has been hit to solve the equation */
+static void
+solve_equation_method (MathEquation *equation, gboolean is_result, gpointer user_data)
+{	
+	MathDisplay *display = user_data;
+	/* Passes the equation to the tree view and then the answer */
+	add_to_list(display->priv->list,display->priv->equation,TRUE);
+	add_to_list(display->priv->list,display->priv->equation,FALSE);
+	gtk_tree_view_columns_autosize (GTK_TREE_VIEW(display->priv->list));
+}
+
 
 static void
 create_gui(MathDisplay *display)
 {
-    GtkWidget *info_view, *info_box, *main_box, *scrolled_window;
+    GtkWidget *info_view, *info_box, *main_box, *scrolled_window;	
 	GtkTreeSelection *selection;
     PangoFontDescription *font_desc;
     int i;
@@ -383,14 +392,15 @@ create_gui(MathDisplay *display)
     gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(scrolled_window), FALSE, FALSE, 0);
 	
 	display->priv->list = gtk_tree_view_new();
-  	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list ), FALSE);
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list ));
+  	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(display->priv->list), FALSE);
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(display->priv->list));
 	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
 	init_list(display->priv->list);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(display->priv->list));
-
+    g_signal_connect (display->priv->equation, "solve_equation", G_CALLBACK (solve_equation_method), display);
+	
 	/* Sets the size of the scrolled window to two rows to show an equation and an answer */
-	gtk_widget_set_size_request (scrolled_window, -1, 50);
+	gtk_widget_set_size_request (scrolled_window,-1, 50);
 	
     display->priv->text_view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(display->priv->equation));
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(display->priv->text_view), GTK_WRAP_WORD);
@@ -409,6 +419,7 @@ create_gui(MathDisplay *display)
     atk_object_set_role(gtk_widget_get_accessible(display->priv->text_view), ATK_ROLE_EDITBAR);
   //FIXME:<property name="AtkObject::accessible-description" translatable="yes" comments="Accessible description for the area in which results are displayed">Result Region</property>
     g_signal_connect(display->priv->text_view, "key-press-event", G_CALLBACK(display_key_press_cb), display);
+	gtk_text_view_place_cursor_onscreen(GTK_TEXT_VIEW(display->priv->text_view));
     gtk_box_pack_start(GTK_BOX(main_box), display->priv->text_view, TRUE, TRUE, 0);
 
     info_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
@@ -432,8 +443,8 @@ create_gui(MathDisplay *display)
         gtk_widget_modify_bg(GTK_WIDGET(display), i, &style->base[i]);
     }
 
-	gtk_widget_show(scrolled_window);
-	gtk_widget_show(display->priv->list);
+	gtk_widget_show(scrolled_window);  	
+    gtk_widget_show(display->priv->list);  
     gtk_widget_show(info_box);
     gtk_widget_show(info_view);
     gtk_widget_show(display->priv->text_view);
