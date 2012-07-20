@@ -97,7 +97,7 @@ static void  on_changed(GtkWidget *widget, MathDisplay *display)
 
   if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter)) 
 	{
-		gtk_tree_model_get(model, &iter, LIST_ITEM, &equation_text,  -1);
+		gtk_tree_model_get(model, &iter, LIST_ITEM, &equation_text,-1);
 		math_equation_set(display->priv->equation,equation_text);
 		g_free(equation_text);
 	}
@@ -363,7 +363,7 @@ status_changed_cb(MathEquation *equation, GParamSpec *spec, MathDisplay *display
 
 /* Checks if the enter key or the equals key has been hit to solve the equation */
 static void
-solve_equation_method (MathEquation *equation, gboolean is_result, gpointer user_data)
+update_history (MathEquation *equation, gboolean is_result, gpointer user_data)
 {	
 	MathDisplay *display = user_data;
 	/* Passes the equation to the tree view and then the answer */
@@ -397,7 +397,7 @@ create_gui(MathDisplay *display)
 	g_signal_connect(selection, "changed", G_CALLBACK(on_changed), display);
 	init_list(display->priv->list);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(display->priv->list));
-    g_signal_connect (display->priv->equation, "solve_equation", G_CALLBACK (solve_equation_method), display);
+    g_signal_connect (display->priv->equation, "update-history", G_CALLBACK (update_history), display);
 	
 	/* Sets the size of the scrolled window to two rows to show an equation and an answer */
 	gtk_widget_set_size_request (scrolled_window,-1, 50);
