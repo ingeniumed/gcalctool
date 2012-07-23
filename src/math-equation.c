@@ -50,7 +50,7 @@ enum {
 
 static GType number_mode_type, number_format_type, angle_unit_type;
 
-static gulong math_equation_log_signal;
+static gulong math_equation_solve_signal;
 
 #define MAX_DIGITS 512
 
@@ -1293,7 +1293,7 @@ math_equation_look_for_answer(gpointer data)
     }
     g_slice_free(SolveData, result);
 
-	g_signal_emit (equation, math_equation_log_signal, 0, TRUE);
+	g_signal_emit (equation, math_equation_solve_signal, 0, TRUE);
     return false;
 }
 
@@ -1319,7 +1319,7 @@ math_equation_solve(MathEquation *equation)
 
     equation->priv->in_solve = true;
 
-    g_signal_emit (equation, math_equation_log_signal, 0, FALSE);
+    g_signal_emit (equation, math_equation_solve_signal, 0, FALSE);
 	
     math_equation_set_number_mode(equation, NORMAL);
 
@@ -1666,7 +1666,7 @@ math_equation_class_init(MathEquationClass *klass)
     number_format_type = math_mp_display_format_get_type();
     angle_unit_type = g_enum_register_static("AngleUnit", angle_unit_values);
 
-    math_equation_log_signal = g_signal_new ("update-history", MATH_TYPE_EQUATION, G_SIGNAL_RUN_LAST, 0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
+    math_equation_solve_signal = g_signal_new ("update-history", MATH_TYPE_EQUATION, G_SIGNAL_RUN_LAST, 0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
 	
     g_object_class_install_property(object_class,
                                     PROP_STATUS,
