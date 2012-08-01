@@ -71,6 +71,7 @@ math_display_get_equation(MathDisplay *display)
     return display->priv->equation;
 }
 
+/* Initialize the tree view by giving it one coloumn that has the calculations */
 static void
 init_list(GtkWidget *list)
 {
@@ -89,6 +90,7 @@ init_list(GtkWidget *list)
   g_object_unref(store);
 }
 
+/* Upon selecting a value in the tree view it appears in the entry box as the current equation */
 static void  on_changed(GtkWidget *widget, MathDisplay *display) 
 {
   GtkTreeIter iter;
@@ -148,7 +150,6 @@ display_key_press_cb(GtkWidget *widget, GdkEventKey *event, MathDisplay *display
     if (new_keyval) {
         gboolean result;
         GdkEvent *new_event;
-
         new_event = gdk_event_copy((GdkEvent *)event);
         ((GdkEventKey *)new_event)->keyval = new_keyval;
         g_signal_emit_by_name(widget, "key-press-event", new_event, &result);
@@ -361,7 +362,7 @@ status_changed_cb(MathEquation *equation, GParamSpec *spec, MathDisplay *display
     }
 }
 
-/* Checks if the enter key or the equals key has been hit to solve the equation */
+/* Checks if the enter key or the equals key has been hit to solve the equation based on the signal emitted in math equation*/
 static void
 update_history (MathEquation *equation, gboolean is_result, gpointer user_data)
 {	
@@ -387,6 +388,7 @@ create_gui(MathDisplay *display)
 	
     g_signal_connect(display, "key-press-event", G_CALLBACK(key_press_cb), display);
 
+	/* Sets up the tree view in a scrolled window so that 2 rows appear at a time and then after can be scrolled */
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);	
     gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(scrolled_window), FALSE, FALSE, 0);
@@ -451,6 +453,7 @@ create_gui(MathDisplay *display)
     gtk_widget_show(display->priv->text_view);
     gtk_widget_show(main_box);
 
+	/* ensures that the cursor goes to the entry box so that a user doesn't have to click themselves */
 	gtk_widget_grab_focus (GTK_WIDGET(display->priv->text_view));
 	
     g_signal_connect(display->priv->equation, "notify::status", G_CALLBACK(status_changed_cb), display);
