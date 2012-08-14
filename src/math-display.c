@@ -37,7 +37,7 @@ struct MathDisplayPrivate
     /* Display widget */
     GtkWidget *text_view;
 
-	/*History Panel*/
+	/* History Panel */
 	GtkWidget *list;
 	
     /* Buffer that shows errors etc */
@@ -91,7 +91,8 @@ init_list(GtkWidget *list)
 }
 
 /* Upon selecting a value in the tree view it appears in the entry box as the current equation */
-static void  on_changed(GtkWidget *widget, MathDisplay *display) 
+static void
+on_changed(GtkWidget *widget, MathDisplay *display) 
 {
   GtkTreeIter iter;
   GtkTreeModel *model;

@@ -45,13 +45,14 @@ add_to_list(GtkWidget *list, MathEquation *equation, gboolean append_flag)
     options.wordlen = 32;
     options.angle_units = MP_DEGREES;
     ret = mp_equation_parse(equation_text, &options, &z, NULL);
+	/* ignore errors */
     if (ret == PARSER_ERR_MP)
     {
-        //nothing
+    	return;
     }
     else if (ret)        
     {
-       //nothing
+    	return;
     }
     else 
     {	

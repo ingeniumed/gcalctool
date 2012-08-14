@@ -250,7 +250,6 @@ key_press_cb(MathWindow *window, GdkEventKey *event)
 {
     gboolean result;
     g_signal_emit_by_name(window->priv->display, "key-press-event", event, &result);
-	//g_signal_emit_by_name(window->priv->history,"key-press-event",event,&result);
     if (math_buttons_get_mode (window->priv->buttons) == PROGRAMMING && (event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) {
         switch(event->keyval)
         {
