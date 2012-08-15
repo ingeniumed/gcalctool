@@ -1,0 +1,19 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="guide"
+      id="history">
+
+    <info>
+        <link type="guide" xref="index#ui"/>
+    </info>
+
+	<title>Using the History View</title>
+    
+    <media type="image" mime="image/png" src="media/history_view.png"/>
+
+    <p>
+    The History View is located above the entry box and is designed to show your previous calculations in the form of a scrollable list 
+    that can be clicked and scrolled through using a mouse or even navigated and selected using the arrow keys on a keyboard. Once an 
+    entry has been selected, it will immediately show up in the entry box for you to manipulate and use. Finally, there isn't an upper 
+    limit on the number of calculations that can show up in the list for you to use.
+    </p>
+</page>
