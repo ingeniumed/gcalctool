@@ -27,12 +27,12 @@ enum
 };
 
 void
-add_to_list(GtkWidget *list, MathEquation *equation, gboolean append_flag)
+math_history_append(GtkWidget *list, MathEquation *equation, gboolean append_flag)
 {
   	MpSerializer *result_serializer;
     int ret;
     char *equation_text;
-	GtkListStore *store;
+    GtkListStore *store;
   	GtkTreeIter iter;
     MPEquationOptions options;
     /* Using the solve method in command line gcalctool to get the answer */ 
@@ -45,32 +45,32 @@ add_to_list(GtkWidget *list, MathEquation *equation, gboolean append_flag)
     options.wordlen = 32;
     options.angle_units = MP_DEGREES;
     ret = mp_equation_parse(equation_text, &options, &z, NULL);
-	/* ignore errors */
+    /* ignore errors */
     if (ret == PARSER_ERR_MP)
     {
-    	return;
+        return;
     }
     else if (ret)        
     {
-    	return;
+        return;
     }
     else 
     {	
-		store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
-		if (append_flag)
-		{
-			/* get the equation */
-			gtk_list_store_append(store, &iter);
-  			gtk_list_store_set(store, &iter, LIST_ITEM, math_equation_get_equation(equation), -1);
-			g_free(result_str);
+	    store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
+	    if (append_flag)
+	    {
+		    /* get the equation */
+		    gtk_list_store_append(store, &iter);
+  		    gtk_list_store_set(store, &iter, LIST_ITEM, math_equation_get_equation(equation), -1);
+		    g_free(result_str);
 		}
 		else if (!append_flag)
 		{
 		    /* get the answer */ 
 		    result_str = mp_serializer_to_string(result_serializer, &z);
-			gtk_list_store_append(store, &iter);
-			gtk_list_store_set(store, &iter, LIST_ITEM, result_str, -1);
-			g_free(result_str);
-		}
+		    gtk_list_store_append(store, &iter);
+		    gtk_list_store_set(store, &iter, LIST_ITEM, result_str, -1);
+		    g_free(result_str);
+	    }
     }
 }

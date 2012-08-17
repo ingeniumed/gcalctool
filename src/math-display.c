@@ -75,35 +75,35 @@ math_display_get_equation(MathDisplay *display)
 static void
 init_list(GtkWidget *list)
 {
-  GtkCellRenderer *renderer;
-  GtkTreeViewColumn *column;
-  GtkListStore *store;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkListStore *store;
 
-  renderer = gtk_cell_renderer_text_new();
-  column = gtk_tree_view_column_new_with_attributes("List Items", renderer, "text", LIST_ITEM, NULL);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("List Items", renderer, "text", LIST_ITEM, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
 
-  store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
+    store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING);
 
-  gtk_tree_view_set_model(GTK_TREE_VIEW(list), GTK_TREE_MODEL(store));
+    gtk_tree_view_set_model(GTK_TREE_VIEW(list), GTK_TREE_MODEL(store));
 
-  g_object_unref(store);
+    g_object_unref(store);
 }
 
 /* Upon selecting a value in the tree view it appears in the entry box as the current equation */
 static void
 on_changed(GtkWidget *widget, MathDisplay *display) 
 {
-  GtkTreeIter iter;
-  GtkTreeModel *model;
-  gchar *equation_text;
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gchar *equation_text;
 
-  if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter)) 
-	{
-		gtk_tree_model_get(model, &iter, LIST_ITEM, &equation_text,-1);
-		math_equation_set(display->priv->equation,equation_text);
-		g_free(equation_text);
-	}
+    if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter)) 
+    {
+	    gtk_tree_model_get(model, &iter, LIST_ITEM, &equation_text,-1);
+	    math_equation_set(display->priv->equation,equation_text);
+	    g_free(equation_text);
+    }
 }
 
 static gboolean
@@ -369,8 +369,8 @@ update_history (MathEquation *equation, gboolean is_result, gpointer user_data)
 {	
 	MathDisplay *display = user_data;
 	/* Passes the equation to the tree view and then the answer */
-	add_to_list(display->priv->list,display->priv->equation,TRUE);
-	add_to_list(display->priv->list,display->priv->equation,FALSE);
+	math_history_append(display->priv->list, display->priv->equation, TRUE);
+	math_history_append(display->priv->list, display->priv->equation, FALSE);
 	gtk_tree_view_columns_autosize (GTK_TREE_VIEW(display->priv->list));
 }
 
